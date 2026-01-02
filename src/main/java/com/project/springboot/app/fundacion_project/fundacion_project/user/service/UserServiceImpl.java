@@ -3,9 +3,11 @@ package com.project.springboot.app.fundacion_project.fundacion_project.user.serv
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.project.springboot.app.fundacion_project.fundacion_project.role.repository.RoleRepository;
 import com.project.springboot.app.fundacion_project.fundacion_project.user.User;
 import com.project.springboot.app.fundacion_project.fundacion_project.user.repository.UserRepository;
 
@@ -14,6 +16,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository repository;
+
+    @Autowired
+    private RoleRepository roleRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     @Override
