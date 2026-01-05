@@ -34,7 +34,7 @@ public class UserController {
         return service.findAll();
     }
 
-    @PostMapping("/create")
+    @PostMapping()
     public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result){
         if(result.hasFieldErrors()){
             return validation(result);

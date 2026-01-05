@@ -38,6 +38,8 @@ public class User {
     )
     private List<Role> roles;
 
+    private boolean enabled;
+
     //@Transient to ignore mapping or persist this attribute to DB
     @Transient
     private boolean admin;
