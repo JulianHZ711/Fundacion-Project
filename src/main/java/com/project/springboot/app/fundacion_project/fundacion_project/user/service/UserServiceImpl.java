@@ -1,6 +1,5 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.user.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,17 +34,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public User save(User user) {
-        Optional<Role> optionalRoleUser = roleRepository.findByName("ROLE_USER");
-        List<Role> roles = new ArrayList<>();
+        // Optional<Role> optionalRoleUser = roleRepository.findByName(user.getRole());
 
-        optionalRoleUser.ifPresent(role -> roles.add(role));
+        // optionalRoleUser.ifPresent(role -> user.setRole(role));
 
-        if(user.isAdmin()){
-            Optional<Role> optionalRoleAdmin = roleRepository.findByName("ROLE_ADMIN");
-            optionalRoleAdmin.ifPresent(role -> roles.add(role));
-        }
-
-        user.setRoles(roles);
+        // if(user.isAdmin()){
+        //     Optional<Role> optionalRoleAdmin = roleRepository.findByName(user.getRoles());
+        //     optionalRoleAdmin.ifPresent(role -> roles.add(role));
+        // }
 
         //Encoding the password using PasswordEncoder
         String encodedPassword = passwordEncoder.encode(user.getPassword());

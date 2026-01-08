@@ -1,20 +1,16 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.user;
 
-import java.util.List;
-
 import com.project.springboot.app.fundacion_project.fundacion_project.role.Role;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "users")
@@ -29,15 +25,11 @@ public class User {
     @NotBlank
     private String password;
 
-    @ManyToMany
-    @JoinTable(
-        name = "users_roles",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id"),
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "role_id"})}
-    )
-    private List<Role> roles;
+    @OneToOne
+    @NotNull
+    private Role role;
 
+    @Transient
     private boolean enabled;
 
     //@Transient to ignore mapping or persist this attribute to DB
@@ -68,12 +60,12 @@ public class User {
         this.password = password;
     }
 
-    public List<Role> getRoles() {
-        return roles;
+    public Role getRole() {
+        return role;
     }
 
-    public void setRoles(List<Role> roles) {
-        this.roles = roles;
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public boolean isAdmin() {
