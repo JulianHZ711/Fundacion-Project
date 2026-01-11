@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.project.springboot.app.fundacion_project.fundacion_project.user.User;
+import com.project.springboot.app.fundacion_project.fundacion_project.user.dto.UserDTO;
 import com.project.springboot.app.fundacion_project.fundacion_project.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -30,17 +31,17 @@ public class UserController {
     private UserService service;
 
     @GetMapping
-    public List<User> list (){
+    public List<User> list(){
         return service.findAll();
     }
 
     @PostMapping()
-    public ResponseEntity<?> create(@Valid @RequestBody User user, BindingResult result){
+    public ResponseEntity<?> create(@Valid @RequestBody UserDTO userDTO, BindingResult result){
         if(result.hasFieldErrors()){
             return validation(result);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(userDTO));
     }
 
     //Method for APIs' validations
