@@ -2,6 +2,7 @@ package com.project.springboot.app.fundacion_project.fundacion_project.user;
 
 import com.project.springboot.app.fundacion_project.fundacion_project.role.Role;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -31,12 +31,8 @@ public class User {
     @NotNull
     private Role role;
 
-    @Transient
+    @Column(nullable = false)
     private boolean enabled;
-
-    //@Transient to ignore mapping or persist this attribute to DB
-    @Transient
-    private boolean admin;
 
     public Long getId() {
         return id;
@@ -70,11 +66,19 @@ public class User {
         this.role = role;
     }
 
-    public boolean isAdmin() {
-        return admin;
+    public boolean isEnabled() {
+        return enabled;
     }
 
-    public void setAdmin(boolean admin) {
-        this.admin = admin;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public void disable(){
+        this.enabled = false;
+    }
+
+    public void enable(){
+        this.enabled = true;
     }
 }
