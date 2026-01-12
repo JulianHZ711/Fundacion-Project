@@ -2,6 +2,7 @@ package com.project.springboot.app.fundacion_project.fundacion_project.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -23,7 +24,7 @@ public class SpringSecurityConfig {
         //All the user routes are public in order for users to create their own account, but the rest of the
         // routes are denied because the user needs to be authenticated.
         return http.authorizeHttpRequests( (auth) -> auth
-        .requestMatchers("/users").permitAll()
+        .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
         .anyRequest().authenticated())
         .csrf(config -> config.disable()) // To avoid vulnerabilities
         .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
