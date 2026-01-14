@@ -28,7 +28,7 @@ public class JpaUserDetailsService implements UserDetailsService {
         Optional<User> userOptional = repository.findByUsername(username);
 
         if(userOptional.isEmpty()){
-            throw new UsernameNotFoundException(String.format("Usernae %s not found", username));
+            throw new UsernameNotFoundException(String.format("Username %s not found", username));
         }
 
         //Getting user info
