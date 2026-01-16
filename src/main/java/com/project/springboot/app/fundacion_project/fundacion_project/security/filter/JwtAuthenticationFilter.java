@@ -1,10 +1,12 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.security.filter;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.crypto.SecretKey;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,7 +17,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.project.springboot.app.fundacion_project.fundacion_project.user.dto.UserDTO;
 
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,15 +25,11 @@ import tools.jackson.core.exc.StreamReadException;
 import tools.jackson.databind.DatabindException;
 import tools.jackson.databind.ObjectMapper;
 
+import static com.project.springboot.app.fundacion_project.fundacion_project.security.TokenJwtConfig.*;
 //This class calls UserDetailsService class in order to authenticate an user in the database.
 //This filter is for authenticating and generating the token, and then we validate if its correct.
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     private AuthenticationManager authenticationManager;
-
-    //Generating the secret key which is the signature for JWT so none can modify it nor create it
-    private static final SecretKey SECRET_KEY = Jwts.SIG.HS256.key().build();
-    private static final String PREFIX_TOKEN = "Bearer ";
-    private static final String HEADER_AUTHORIZATION = "Authorization";
 
     public JwtAuthenticationFilter(
             org.springframework.security.authentication.AuthenticationManager authenticationManager) {
@@ -70,9 +67,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // we want to authenticate (in our case, UserDTO)
         User user = (User) authResult.getPrincipal();
         String username = user.getUsername();
+        Object role = authResult.getCredentials(); //Getting the roles
+
+        //Claims are data, they are part of the payload. We can add more claims to our generated token
+        Claims claims = Jwts.claims().build();
+        claims.put("authorities", role);
 
         //Building the JWT token using their own secret key for each session
-        String token = Jwts.builder().subject(username).signWith(SECRET_KEY).compact();
+        String token = Jwts.builder()
+                        .subject(username)
+                        .claims(claims)
+                        .expiration(new Date(System.currentTimeMillis() + 3600000)) //1h duration token
+                        .issuedAt(new Date())
+                        .signWith(SECRET_KEY)
+                        .compact();
 
         //Sending the token to the client
         response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + token);
