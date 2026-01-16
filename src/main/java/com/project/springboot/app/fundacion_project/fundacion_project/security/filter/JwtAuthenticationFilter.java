@@ -12,10 +12,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.project.springboot.app.fundacion_project.fundacion_project.user.dto.UserDTO;
+import com.project.springboot.app.fundacion_project.fundacion_project.user.User;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -40,14 +39,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        UserDTO userDto = null;
+        User user = null;
         String username = null;
         String password = null;
 
         try {
-            userDto = new ObjectMapper().readValue(request.getInputStream(), UserDTO.class);
-            username = userDto.getUsername();
-            password = userDto.getPassword();
+            user = new ObjectMapper().readValue(request.getInputStream(), User.class);
+            username = user.getUsername();
+            password = user.getPassword();
         } catch (StreamReadException | DatabindException | IOException  e) {
             e.printStackTrace();
         }
@@ -65,13 +64,12 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     Authentication authResult) throws IOException, ServletException {
         //Obtaining the username by calling authResult.getPrincipal which returns an object depending on the class
         // we want to authenticate (in our case, UserDTO)
-        User user = (User) authResult.getPrincipal();
+        org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authResult.getPrincipal();
         String username = user.getUsername();
         Object role = authResult.getCredentials(); //Getting the roles
 
         //Claims are data, they are part of the payload. We can add more claims to our generated token
-        Claims claims = Jwts.claims().build();
-        claims.put("authorities", role);
+        Claims claims = Jwts.claims().add("authorities", role).build();
 
         //Building the JWT token using their own secret key for each session
         String token = Jwts.builder()
