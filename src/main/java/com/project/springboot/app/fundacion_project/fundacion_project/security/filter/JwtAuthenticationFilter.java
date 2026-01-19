@@ -70,7 +70,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         //Claims are data, they are part of the payload. We can add more claims to our generated token
         Claims claims = Jwts.claims()
-        .add("authorities", role)
+        .add("authorities", new ObjectMapper().writeValueAsString(role)) //We have to send the role as a JSON
         .add("username", username)
         .build();
 

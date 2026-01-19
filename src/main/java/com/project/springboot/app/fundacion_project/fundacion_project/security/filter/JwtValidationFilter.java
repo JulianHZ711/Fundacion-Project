@@ -42,6 +42,8 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
         //If the token received is null or the token does not start with our predefined standard "bearer", then
         // don't validate this session
         if(header == null || !header.startsWith(PREFIX_TOKEN)){
+            //If the API does not need validation, send the user to it
+            chain.doFilter(request, response);
             return;
         }
 
