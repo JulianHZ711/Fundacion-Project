@@ -69,7 +69,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Object role = authResult.getCredentials(); //Getting the roles
 
         //Claims are data, they are part of the payload. We can add more claims to our generated token
-        Claims claims = Jwts.claims().add("authorities", role).build();
+        Claims claims = Jwts.claims()
+        .add("authorities", role)
+        .add("username", username)
+        .build();
 
         //Building the JWT token using their own secret key for each session
         String token = Jwts.builder()
