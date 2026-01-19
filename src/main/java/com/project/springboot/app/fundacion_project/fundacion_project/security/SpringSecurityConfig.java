@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.project.springboot.app.fundacion_project.fundacion_project.security.filter.JwtAuthenticationFilter;
+import com.project.springboot.app.fundacion_project.fundacion_project.security.filter.JwtValidationFilter;
 
 @Configuration
 public class SpringSecurityConfig {
@@ -40,6 +41,7 @@ public class SpringSecurityConfig {
         .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
         .anyRequest().authenticated())
         .addFilter(new JwtAuthenticationFilter(authenticationManager())) //Adding the authentications
+        .addFilter(new JwtValidationFilter(authenticationManager()))
         .csrf(config -> config.disable()) // To avoid vulnerabilities
         .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .build(); //Session creationg policy will be STATELESS so everything authentication-related will be handled by the token
