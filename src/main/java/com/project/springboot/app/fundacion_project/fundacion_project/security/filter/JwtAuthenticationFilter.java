@@ -1,9 +1,12 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.security.filter;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -12,6 +15,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.project.springboot.app.fundacion_project.fundacion_project.user.User;
@@ -66,11 +70,15 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // we want to authenticate (in our case, UserDTO)
         org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authResult.getPrincipal();
         String username = user.getUsername();
-        Object role = authResult.getCredentials(); //Getting the roles
+        Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities(); //Getting the roles
+
+        List<org.springframework.security.core.authority.SimpleGrantedAuthority> authoritiesList = authorities.stream()
+        .map(auth -> new org.springframework.security.core.authority.SimpleGrantedAuthority(auth.getAuthority()))
+        .collect(Collectors.toList());
 
         //Claims are data, they are part of the payload. We can add more claims to our generated token
         Claims claims = Jwts.claims()
-        .add("authorities", new ObjectMapper().writeValueAsString(role)) //We have to send the role as a JSON
+        .add("authorities", new ObjectMapper().writeValueAsString(authoritiesList)) //We have to send the role as a JSON
         .add("username", username)
         .build();
 

@@ -38,6 +38,8 @@ public class SpringSecurityConfig {
         //All the user routes are public in order for users to create their own account, but the rest of the
         // routes are denied because the user needs to be authenticated.
         return http.authorizeHttpRequests( (auth) -> auth
+        .requestMatchers("/login").permitAll()
+        .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
         .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
         .anyRequest().authenticated())
         .addFilter(new JwtAuthenticationFilter(authenticationManager())) //Adding the authentications

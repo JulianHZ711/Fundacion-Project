@@ -6,7 +6,9 @@ import static com.project.springboot.app.fundacion_project.fundacion_project.sec
 import static com.project.springboot.app.fundacion_project.fundacion_project.security.TokenJwtConfig.SECRET_KEY;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -61,17 +63,25 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
             Object authorityClaims = claims.get("authorities");
 
             //Converting the role from an object to a real grantedAuthority object 
-            GrantedAuthority authority = new ObjectMapper().readValue(authorityClaims.toString().getBytes(), SimpleGrantedAuthority.class);
+            SimpleGrantedAuthority[] authoritiesArray = new ObjectMapper().readValue(
+                authorityClaims.toString().getBytes(),
+                SimpleGrantedAuthority[].class
+            );
+
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            for(SimpleGrantedAuthority authority : authoritiesArray){
+                authorities.add(authority);
+            }
 
             //Logging in using UsernamePasswordAuthenticationToken
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, authority);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
 
             //Authenticating the session token
             SecurityContextHolder .getContext().setAuthentication(authenticationToken);
 
             //Continue with the filter chain
             chain.doFilter(request, response);
-        } catch (JwtException e){
+        } catch (JwtException | IOException e){
             Map<String, String> body = new HashMap<>();
             body.put("error", e.getMessage());
             body.put("message", "El token JWT no es valido");
