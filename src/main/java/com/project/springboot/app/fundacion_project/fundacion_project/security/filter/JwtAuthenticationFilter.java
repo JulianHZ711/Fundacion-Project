@@ -70,7 +70,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         // we want to authenticate (in our case, UserDTO)
         org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) authResult.getPrincipal();
         String username = user.getUsername();
-        Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities(); //Getting the roles
+        Collection<? extends GrantedAuthority> authorities = authResult.getAuthorities(); //Getting the validated password
 
         List<org.springframework.security.core.authority.SimpleGrantedAuthority> authoritiesList = authorities.stream()
         .map(auth -> new org.springframework.security.core.authority.SimpleGrantedAuthority(auth.getAuthority()))

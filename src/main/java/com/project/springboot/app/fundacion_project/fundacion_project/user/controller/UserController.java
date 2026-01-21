@@ -17,12 +17,13 @@ import com.project.springboot.app.fundacion_project.fundacion_project.user.servi
 
 import jakarta.validation.Valid;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PostMapping;
 
-
-
+//Setting CORS for front-end and back-end communication (likely to change in the future)
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/users")
 public class UserController {
