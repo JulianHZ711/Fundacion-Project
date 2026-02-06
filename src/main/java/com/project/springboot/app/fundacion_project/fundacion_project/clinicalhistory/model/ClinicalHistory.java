@@ -1,5 +1,7 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.model;
 
+import java.time.LocalDate;
+
 import com.project.springboot.app.fundacion_project.fundacion_project.child.model.Child;
 
 import jakarta.persistence.Column;
@@ -8,7 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -19,24 +22,21 @@ public class ClinicalHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 500)
-    private String diagnosis;
+    private String fileName;
 
-    @Column(length = 500)
-    private String allergies;
+    private String fileType;
 
-    @OneToOne
-    @JoinColumn(name = "child_id", nullable = false, unique = true)
+    private LocalDate uploadDate;
+
+    @Lob
+    @Column(columnDefinition = "LONGBLOB")
+    private byte[] file;
+
+     @ManyToOne
+    @JoinColumn(name = "child_document", nullable = false)
     private Child child;
 
     public ClinicalHistory() {
-    }
-
-    public ClinicalHistory(Long id, String diagnosis, String allergies, Child child) {
-        this.id = id;
-        this.diagnosis = diagnosis;
-        this.allergies = allergies;
-        this.child = child;
     }
 
     public Long getId() {
@@ -47,20 +47,36 @@ public class ClinicalHistory {
         this.id = id;
     }
 
-    public String getDiagnosis() {
-        return diagnosis;
+    public String getFileName() {
+        return fileName;
     }
 
-    public void setDiagnosis(String diagnosis) {
-        this.diagnosis = diagnosis;
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
-    public String getAllergies() {
-        return allergies;
+    public String getFileType() {
+        return fileType;
     }
 
-    public void setAllergies(String allergies) {
-        this.allergies = allergies;
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
+    }
+
+    public LocalDate getUploadDate() {
+        return uploadDate;
+    }
+
+    public void setUploadDate(LocalDate uploadDate) {
+        this.uploadDate = uploadDate;
+    }
+
+    public byte[] getFile() {
+        return file;
+    }
+
+    public void setFile(byte[] file) {
+        this.file = file;
     }
 
     public Child getChild() {
@@ -70,4 +86,7 @@ public class ClinicalHistory {
     public void setChild(Child child) {
         this.child = child;
     }
+
+    
+   
 }

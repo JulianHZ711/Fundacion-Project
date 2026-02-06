@@ -1,23 +1,21 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public class ClinicalHistoryRequestDto {
 
-    private String diagnosis;
-    private String allergies;
+    @NotNull(message = "childId is required")
+    private Long childId;
 
-    public String getDiagnosis() {
-        return diagnosis;
+    public ClinicalHistoryRequestDto() {
     }
 
-    public void setDiagnosis(String diagnosis) {
-        this.diagnosis = diagnosis;
+    public Long getChildId() {
+        return childId;
     }
 
-    public String getAllergies() {
-        return allergies;
-    }
-
-    public void setAllergies(String allergies) {
-        this.allergies = allergies;
+    public void setChildId(Long childId) {
+        this.childId = childId;
     }
 }
+

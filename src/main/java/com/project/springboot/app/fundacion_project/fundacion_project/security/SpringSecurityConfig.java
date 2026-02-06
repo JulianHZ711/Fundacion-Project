@@ -43,20 +43,54 @@ public class SpringSecurityConfig {
     //Adding the filters to validate all the requests, authorize or deny permissions, etc.
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        //All the user routes are public in order for users to create their own account, but the rest of the
-        // routes are denied because the user needs to be authenticated.
-        return http.authorizeHttpRequests( (auth) -> auth
-        .requestMatchers("/login").permitAll()
-        .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
-        .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
-        .anyRequest().authenticated())
-        .addFilter(new JwtAuthenticationFilter(authenticationManager())) //Adding the authentications
+
+        // All the user routes are public in order for users to create their own account,
+        // but the rest of the routes are denied because the user needs to be authenticated.
+        return http.authorizeHttpRequests(auth -> auth
+
+            // Public login endpoint
+            .requestMatchers("/login").permitAll()
+
+            // USERS → only ADMIN
+            .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
+
+            // CHILDREN
+
+            // Create / Update / Delete children → ADMIN only
+            .requestMatchers(HttpMethod.POST, "/children").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.PUT, "/children/**").hasRole("ADMIN")
+            .requestMatchers(HttpMethod.DELETE, "/children/**").hasRole("ADMIN")
+
+            // Read children → all roles
+            .requestMatchers(HttpMethod.GET, "/children/**")
+            .hasAnyRole("ADMIN", "COORDINATOR", "NUTRITIONIST", "PSYCHOLOGIST", "SOCIAL_WORKER")
+
+            // CLINICAL HISTORY
+            // Full CRUD access for all roles
+            .requestMatchers("/clinical-histories/**")
+            .hasAnyRole("ADMIN", "COORDINATOR", "NUTRITIONIST", "PSYCHOLOGIST", "SOCIAL_WORKER")
+
+            // Any other request must be authenticated
+            .anyRequest().authenticated()
+        )
+
+        // Adding the authentications
+        .addFilter(new JwtAuthenticationFilter(authenticationManager()))
         .addFilter(new JwtValidationFilter(authenticationManager()))
-        .csrf(config -> config.disable()) // To avoid vulnerabilities
-        .cors(cors -> cors.configurationSource(corsConfigurationSource())) //Passing the cors config
+
+        // To avoid vulnerabilities
+        .csrf(config -> config.disable())
+
+        // Passing the cors config
+        .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+        // Session creation policy will be STATELESS so everything authentication-related will be handled by the token
         .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .build(); //Session creationg policy will be STATELESS so everything authentication-related will be handled by the token
+
+        .build();
     }
+
 
     //Setting up the beans for the CORS configuration
     @Bean

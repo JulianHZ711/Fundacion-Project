@@ -3,5 +3,5 @@ package com.project.springboot.app.fundacion_project.fundacion_project.child.rep
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.project.springboot.app.fundacion_project.fundacion_project.child.model.Child;
 
-public interface ChildRepository extends JpaRepository<Child, Long> {
+public interface ChildRepository extends JpaRepository<Child, String> {
 }

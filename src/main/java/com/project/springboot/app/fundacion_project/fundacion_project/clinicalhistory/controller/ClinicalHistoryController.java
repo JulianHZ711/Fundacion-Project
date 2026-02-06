@@ -1,35 +1,87 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import java.io.IOException;
+import java.util.List;
 
-import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.dto.ClinicalHistoryRequestDto;
+import jakarta.validation.constraints.NotNull;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.dto.ClinicalHistoryResponseDto;
+import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.model.ClinicalHistory;
 import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.service.ClinicalHistoryService;
 
-@RestController
-@RequestMapping("/api/children/{childId}/clinical-history")
-@PreAuthorize("hasRole('ADMIN')")
-public class ClinicalHistoryController {
-    
-       private final ClinicalHistoryService clinicalHistoryService;
 
-    public ClinicalHistoryController(ClinicalHistoryService clinicalHistoryService) {
-        this.clinicalHistoryService = clinicalHistoryService;
+
+@RestController
+@RequestMapping("/clinical-histories")
+@Validated
+public class ClinicalHistoryController {
+
+    private final ClinicalHistoryService service;
+
+    public ClinicalHistoryController(ClinicalHistoryService service) {
+        this.service = service;
     }
 
-    @PostMapping
-    public ResponseEntity<ClinicalHistoryResponseDto> create(
-            @PathVariable Long childId,
-            @RequestBody ClinicalHistoryRequestDto dto) {
+    // ================= UPLOAD PDF =================
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(clinicalHistoryService.createClinicalHistory(childId, dto));
+    @PostMapping("/upload")
+    public ResponseEntity<ClinicalHistoryResponseDto> upload(
+            @RequestParam("childDocument") @NotNull(message = "childDocument is required") String childDocument,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("fileName") @NotNull(message = "fileName is required") String fileName) throws IOException {
+
+        return ResponseEntity.ok(service.upload(childDocument, file, fileName));
+    }
+
+    // ================= LIST BY CHILD =================
+
+    @GetMapping("/child/{childDocument}")
+    public ResponseEntity<List<ClinicalHistoryResponseDto>> findByChild(
+            @PathVariable String childDocument) {
+
+        return ResponseEntity.ok(service.findByChild(childDocument));
+    }
+
+    // ================= FIND BY ID =================
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClinicalHistoryResponseDto> findById(@PathVariable Long id) {
+
+        return ResponseEntity.ok(service.findById(id));
+    }
+
+    // ================= DOWNLOAD PDF =================
+
+    
+    @GetMapping("/download/{id}")
+        public ResponseEntity<byte[]> download(@PathVariable Long id) {
+            
+            ClinicalHistory history = service.findEntityById(id);
+            
+            // Sanitizar el nombre del archivo
+            String fileName = history.getFileName().replaceAll("[^a-zA-Z0-9.-]", "_");
+            
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION,
+                            "attachment; filename=\"" + fileName + "\"")
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_PDF_VALUE)
+                    .contentLength(history.getFile().length)
+                    .body(history.getFile());
+        }
+
+    // ================= DELETE =================
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

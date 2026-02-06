@@ -1,46 +1,105 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.service;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.project.springboot.app.fundacion_project.fundacion_project.child.model.Child;
 import com.project.springboot.app.fundacion_project.fundacion_project.child.repository.ChildRepository;
-import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.dto.ClinicalHistoryRequestDto;
 import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.dto.ClinicalHistoryResponseDto;
+import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.exception.ClinicalHistoryNotFoundException;
 import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.model.ClinicalHistory;
 import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.repository.ClinicalHistoryRepository;
 
 @Service
 public class ClinicalHistoryServiceImpl implements ClinicalHistoryService {
 
-      private final ChildRepository childRepository;
-    private final ClinicalHistoryRepository clinicalHistoryRepository;
+    private final ClinicalHistoryRepository historyRepository;
+    private final ChildRepository childRepository;
 
     public ClinicalHistoryServiceImpl(
-            ChildRepository childRepository,
-            ClinicalHistoryRepository clinicalHistoryRepository) {
+            ClinicalHistoryRepository historyRepository,
+            ChildRepository childRepository) {
+
+        this.historyRepository = historyRepository;
         this.childRepository = childRepository;
-        this.clinicalHistoryRepository = clinicalHistoryRepository;
     }
 
     @Override
-    public ClinicalHistoryResponseDto createClinicalHistory(Long childId, ClinicalHistoryRequestDto dto) {
+    public ClinicalHistoryResponseDto upload(String childDocument, MultipartFile file, String fileName) throws IOException {
 
-        Child child = childRepository.findById(childId)
+        if (file == null || file.isEmpty()) {
+            throw new RuntimeException("PDF file is required");
+        }
+
+        if (!file.getContentType().equals("application/pdf")) {
+            throw new RuntimeException("Only PDF files are allowed");
+        }
+
+        Child child = childRepository.findById(childDocument)
                 .orElseThrow(() -> new RuntimeException("Child not found"));
 
         ClinicalHistory history = new ClinicalHistory();
-        history.setDiagnosis(dto.getDiagnosis());
-        history.setAllergies(dto.getAllergies());
+        history.setFileName(fileName);
+        history.setFileType(file.getContentType());
+        history.setUploadDate(LocalDate.now());
+        history.setFile(file.getBytes());
         history.setChild(child);
 
-        history = clinicalHistoryRepository.save(history);
+        history = historyRepository.save(history);
 
-        ClinicalHistoryResponseDto response = new ClinicalHistoryResponseDto();
-        response.setId(history.getId());
-        response.setDiagnosis(history.getDiagnosis());
-        response.setAllergies(history.getAllergies());
-        response.setChildId(child.getId());
+        return mapToDto(history);
+    }
 
-        return response;
+    @Override
+    public List<ClinicalHistoryResponseDto> findByChild(String childDocument) {
+
+        if (!childRepository.existsById(childDocument)) {
+            throw new RuntimeException("Child not found");
+        }
+
+        return historyRepository.findByChild_Document(childDocument)
+                .stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ClinicalHistoryResponseDto findById(Long id) {
+        ClinicalHistory history = historyRepository.findById(id)
+                .orElseThrow(() -> new ClinicalHistoryNotFoundException(id));
+
+        return mapToDto(history);
+    }
+
+    @Override
+    public ClinicalHistory findEntityById(Long id) {
+        return historyRepository.findById(id)
+                .orElseThrow(() -> new ClinicalHistoryNotFoundException(id));
+    }
+
+    @Override
+    public void delete(Long id) {
+        ClinicalHistory history = historyRepository.findById(id)
+                .orElseThrow(() -> new ClinicalHistoryNotFoundException(id));
+
+        historyRepository.delete(history);
+    }
+
+    private ClinicalHistoryResponseDto mapToDto(ClinicalHistory history) {
+        ClinicalHistoryResponseDto dto = new ClinicalHistoryResponseDto();
+
+        dto.setId(history.getId());
+        dto.setFileName(history.getFileName());
+        dto.setFileType(history.getFileType());
+        dto.setUploadDate(history.getUploadDate());
+        dto.setChildDocument(history.getChild().getDocument());
+        
+
+        return dto;
     }
 }
