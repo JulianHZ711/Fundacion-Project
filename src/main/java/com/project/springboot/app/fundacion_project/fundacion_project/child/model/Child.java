@@ -5,12 +5,17 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.project.springboot.app.fundacion_project.fundacion_project.child.enums.EstadoNino;
+import com.project.springboot.app.fundacion_project.fundacion_project.child.enums.TipoDocumento;
 import com.project.springboot.app.fundacion_project.fundacion_project.clinicalhistory.model.ClinicalHistory;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
@@ -34,11 +39,54 @@ public class Child {
     @Column(nullable = false)
     private String gender;  
 
+    public LocalDate getFechaIngreso() {
+        return fechaIngreso;
+    }
+
+    public void setFechaIngreso(LocalDate fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
+    }
+
+    public EstadoNino getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoNino estado) {
+        this.estado = estado;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
+    }
+
+    public TipoDocumento getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    public void setTipoDocumento(TipoDocumento tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
+    }
+
     @Column(nullable = false)
     private String bloodType;  
 
     @Transient  
     private Integer age;  
+
+     @Column(nullable = false)
+    private LocalDate fechaIngreso;  
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private EstadoNino estado;  
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String observaciones;  
 
     @OneToMany(mappedBy = "child", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClinicalHistory> clinicalHistories = new ArrayList<>();
@@ -48,14 +96,19 @@ public class Child {
     public Child() {
     }
 
-    public Child(String document, String firstName, String lastName, 
-                 LocalDate birthDate, String gender, String bloodType) {
+    public Child(String document, TipoDocumento tipoDocumento, String firstName, String lastName,
+                 LocalDate birthDate, String gender, String bloodType, LocalDate fechaIngreso,
+                 EstadoNino estado, String observaciones) {
         this.document = document;
+        this.tipoDocumento = tipoDocumento;
         this.firstName = firstName;
         this.lastName = lastName;
         this.birthDate = birthDate;
         this.gender = gender;
         this.bloodType = bloodType;
+        this.fechaIngreso = fechaIngreso;
+        this.estado = estado;
+        this.observaciones = observaciones;
     }
 
     // ========== MÉTODO PARA CALCULAR EDAD ==========
@@ -65,11 +118,9 @@ public class Child {
             return null;
         }
         return Period.between(birthDate, LocalDate.now()).getYears();
-        // ← Period.between calcula la diferencia entre dos fechas
-        // ← .getYears() devuelve solo los años completos
+    
     }
 
-    // NO necesitas setAge() porque se calcula automáticamente
 
     // ========== GETTERS Y SETTERS ==========
 
@@ -80,6 +131,8 @@ public class Child {
     public void setDocument(String document) {
         this.document = document;
     }
+
+    private TipoDocumento tipoDocumento;
 
     public String getFirstName() {
         return firstName;
