@@ -2,15 +2,23 @@ package com.project.springboot.app.fundacion_project.fundacion_project.child.dto
 
 import java.time.LocalDate;
 
+import com.project.springboot.app.fundacion_project.fundacion_project.child.enums.EstadoNino;
+import com.project.springboot.app.fundacion_project.fundacion_project.child.enums.TipoDocumento;
+
+
 public class ChildResponseDto {
     
     private String document;
+    private TipoDocumento tipoDocumento;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
     private String gender;
     private String bloodType;
-    private Integer age;  // ← Se incluye en la respuesta (calculada)
+    private LocalDate fechaIngreso;
+    private EstadoNino estado;
+    private String observaciones;
+    private Integer age;
 
     // ========== GETTERS Y SETTERS ==========
 
@@ -20,6 +28,14 @@ public class ChildResponseDto {
 
     public void setDocument(String document) {
         this.document = document;
+    }
+
+    public TipoDocumento getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    public void setTipoDocumento(TipoDocumento tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
     }
 
     public String getFirstName() {
@@ -60,6 +76,30 @@ public class ChildResponseDto {
 
     public void setBloodType(String bloodType) {
         this.bloodType = bloodType;
+    }
+
+    public LocalDate getFechaIngreso() {
+        return fechaIngreso;
+    }
+
+    public void setFechaIngreso(LocalDate fechaIngreso) {
+        this.fechaIngreso = fechaIngreso;
+    }
+
+    public EstadoNino getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoNino estado) {
+        this.estado = estado;
+    }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
     }
 
     public Integer getAge() {

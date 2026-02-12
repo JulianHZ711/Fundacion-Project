@@ -36,15 +36,18 @@ public class ChildServiceImpl implements ChildService {
 
     @Override
     public ChildResponseDto create(ChildRequestDto dto) {
-    
-        Child child = new Child(
-            dto.getDocument(),
-            dto.getFirstName(),
-            dto.getLastName(),
-            dto.getBirthDate(),
-            dto.getGender(),
-            dto.getBloodType()
-        );
+        
+        Child child = new Child();
+        child.setDocument(dto.getDocument());
+        child.setTipoDocumento(dto.getTipoDocumento());
+        child.setFirstName(dto.getFirstName());
+        child.setLastName(dto.getLastName());
+        child.setBirthDate(dto.getBirthDate());
+        child.setGender(dto.getGender());
+        child.setBloodType(dto.getBloodType());
+        child.setFechaIngreso(dto.getFechaIngreso());
+        child.setEstado(dto.getEstado());
+        child.setObservaciones(dto.getObservaciones());
 
         return map(childRepository.save(child));
     }
@@ -55,13 +58,16 @@ public class ChildServiceImpl implements ChildService {
         Child child = childRepository.findById(document)
                 .orElseThrow();
 
-        // Actualizar todos los campos
         child.setDocument(dto.getDocument());
+        child.setTipoDocumento(dto.getTipoDocumento());
         child.setFirstName(dto.getFirstName());
         child.setLastName(dto.getLastName());
         child.setBirthDate(dto.getBirthDate());
         child.setGender(dto.getGender());
         child.setBloodType(dto.getBloodType());
+        child.setFechaIngreso(dto.getFechaIngreso());
+        child.setEstado(dto.getEstado());
+        child.setObservaciones(dto.getObservaciones());
 
         return map(childRepository.save(child));
     }
@@ -75,12 +81,16 @@ public class ChildServiceImpl implements ChildService {
         
         ChildResponseDto dto = new ChildResponseDto();
         dto.setDocument(child.getDocument());
+        dto.setTipoDocumento(child.getTipoDocumento());
         dto.setFirstName(child.getFirstName());
         dto.setLastName(child.getLastName());
         dto.setBirthDate(child.getBirthDate());
         dto.setGender(child.getGender());
         dto.setBloodType(child.getBloodType());
-        dto.setAge(child.getAge());  // ← La edad se calcula automáticamente
+        dto.setFechaIngreso(child.getFechaIngreso());
+        dto.setEstado(child.getEstado());
+        dto.setObservaciones(child.getObservaciones());
+        dto.setAge(child.getAge());
 
         return dto;
     } 
