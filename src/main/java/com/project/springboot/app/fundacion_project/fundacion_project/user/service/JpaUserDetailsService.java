@@ -35,7 +35,7 @@ public class JpaUserDetailsService implements UserDetailsService {
         User user = userOptional.orElseThrow();
 
         //Converting the role to a list in order to avoid errors because spring security constructor requires a list
-        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().getName()));
+        List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(user.getRole().getName().toString()));
 
         return new org.springframework.security.core.userdetails.User(
             user.getUsername(),

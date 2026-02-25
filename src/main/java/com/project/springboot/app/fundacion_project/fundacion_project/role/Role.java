@@ -1,7 +1,11 @@
 package com.project.springboot.app.fundacion_project.fundacion_project.role;
 
+import com.project.springboot.app.fundacion_project.fundacion_project.role.enums.RoleName;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,14 +18,15 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     //Unique column because role names have to be unique
     @Column(unique = true)
-    private String name;
+    private RoleName name;
 
     public Role() {
     }
 
-    public Role(String name) {
+    public Role(RoleName name) {
         this.name = name;
     }
 
@@ -33,11 +38,11 @@ public class Role {
         this.id = id;
     }
 
-    public String getName() {
+    public RoleName getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(RoleName name) {
         this.name = name;
     }
 }
